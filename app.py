@@ -7,15 +7,22 @@ from langchain.agents.agent_types import AgentType
 from langchain.agents import Tool, initialize_agent
 from langchain.callbacks import StreamlitCallbackHandler
 
-## Set upi the Stramlit app
-st.set_page_config(page_title="Text To MAth Problem Solver And Data Serach Assistant",page_icon="🧮")
-st.title("Text To Math Problem Solver Uing Google Gemma 2")
+## Set up the Streamlit app
+st.set_page_config(
+    page_title="TheoremAI | Intelligent Math & Research Assistant",
+    page_icon="∞",
+    layout="centered"
+)
 
-groq_api_key=st.sidebar.text_input(label="Groq API Key",type="password")
+st.title("✨ TheoremAI")
+st.markdown("##### Your Intelligent Mathematical & Logical Reasoning Agent")
+
+st.sidebar.header("Configuration ⚙️")
+groq_api_key=st.sidebar.text_input(label="Groq API Key",type="password", help="Enter your Groq API key to power the logic engine.")
 
 
 if not groq_api_key:
-    st.info("Please add your Groq APPI key to continue")
+    st.info("👋 Please add your Groq API key in the sidebar to awaken the agent.")
     st.stop()
 
 llm=ChatGroq(model="llama-3.3-70b-versatile",groq_api_key=groq_api_key)
@@ -26,7 +33,7 @@ wikipedia_wrapper=WikipediaAPIWrapper()
 wikipedia_tool=Tool(
     name="Wikipedia",
     func=wikipedia_wrapper.run,
-    description="A tool for searching the Internet to find the vatious information on the topics mentioned"
+    description="A tool for searching the Internet to find various scientific and historical information on mentioned topics."
 
 )
 
@@ -46,13 +53,13 @@ def evaluate_math(expression: str) -> str:
 calculator=Tool(
     name="Calculator",
     func=evaluate_math,
-    description="A tools for answering math related questions. Only input mathematical expression need to bed provided"
+    description="A tool for answering math-related questions. Only a raw mathematical expression should be provided."
 )
 
 prompt="""
-Your a agent tasked for solving users mathemtical question. Logically arrive at the solution and provide a detailed explanation
-and display it point wise for the question below
-Question:{question}
+You are an advanced reasoning agent tasked with solving the user's mathematical and text-based logic questions. 
+Logically arrive at the solution, provide a detailed step-by-step reasoning process, and display it clearly point-wise.
+Question: {question}
 Answer:
 """
 
@@ -82,18 +89,22 @@ assistant_agent=initialize_agent(
 
 if "messages" not in st.session_state:
     st.session_state["messages"]=[
-        {"role":"assistant","content":"Hi, I'm a MAth chatbot who can answer all your maths questions"}
+        {"role":"assistant","content":"Hi! I'm **TheoremAI**. Ask me a complex math problem or logic puzzle, and I'll break it down for you."}
     ]
 
 for msg in st.session_state.messages:
     st.chat_message(msg["role"]).write(msg['content'])
 
-## LEts start the interaction
-question=st.text_area("Enter youe question:","I have 5 bananas and 7 grapes. I eat 2 bananas and give away 3 grapes. Then I buy a dozen apples and 2 packs of blueberries. Each pack of blueberries contains 25 berries. How many total pieces of fruit do I have at the end?")
+## Let's start the interaction
+question=st.text_area(
+    "💬 What logic puzzle can I solve for you today?",
+    "I have 5 bananas and 7 grapes. I eat 2 bananas and give away 3 grapes. Then I buy a dozen apples and 2 packs of blueberries. Each pack of blueberries contains 25 berries. How many total pieces of fruit do I have at the end?",
+    height=120
+)
 
-if st.button("find my answer"):
+if st.button("Calculate Answer 🚀"):
     if question:
-        with st.spinner("Generate response.."):
+        with st.spinner("Reasoning and executing tools..."):
             st.session_state.messages.append({"role":"user","content":question})
             st.chat_message("user").write(question)
 
